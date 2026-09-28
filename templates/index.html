@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>College FAQ Assistant</title>
+  <style>
+    /* ===== Colors (light theme). Inga color maathina full page maarum ===== */
+    :root {
+      --primary: #1e3a8a;
+      --primary-2: #3b82f6;
+      --accent: #f59e0b;
+      --bg: #eef2f9;
+      --card: #ffffff;
+      --chat-bg: #f6f8fc;
+      --bot-bubble: #ffffff;
+      --user-bubble: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e2e8f0;
+    }
+    /* ===== Dark theme ===== */
+    html.dark {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --chat-bg: #0f172a;
+      --bot-bubble: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; padding: 20px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg); color: var(--text);
+      display: flex; justify-content: center; align-items: center;
+      transition: background 0.3s;
+    }
+
+    .app {
+      width: 100%; max-width: 760px; height: 92vh; max-height: 780px;
+      background: var(--card); border-radius: 18px; overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+      display: flex; flex-direction: column;
+    }
+
+    /* ===== Header ===== */
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff; padding: 16px 20px;
+      display: flex; align-items: center; gap: 14px;
+      border-bottom: 4px solid var(--accent);
+    }
+    .logo {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #fff; display: grid; place-items: center; font-size: 28px;
+    }
+    .title { flex: 1; }
+    .title h1 { margin: 0; font-size: 19px; }
+    .title p { margin: 3px 0 0; font-size: 13px; opacity: 0.9; }
+    .dot {
+      display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+      background: #22c55e; margin-right: 5px;
+    }
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.18); border: none; color: #fff;
+      width: 38px; height: 38px; border-radius: 50%; font-size: 17px; cursor: pointer;
+    }
+    .icon-btn:hover { background: rgba(255, 255, 255, 0.32); }
+
+    /* ===== Quick question chips ===== */
+    .chips {
+      display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto;
+      border-bottom: 1px solid var(--border); background: var(--card);
+    }
+    .chip {
+      white-space: nowrap; border: 1px solid var(--primary-2); color: var(--primary-2);
+      background: transparent; padding: 7px 14px; border-radius: 20px;
+      font-size: 13px; cursor: pointer; transition: 0.2s;
+    }
+    .chip:hover { background: var(--primary-2); color: #fff; }
+
+    /* ===== Chat area ===== */
+    #chat {
+      flex: 1; overflow-y: auto; padding: 18px; background: var(--chat-bg);
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .row { display: flex; gap: 10px; align-items: flex-end; animation: pop 0.25s ease; }
+    .row.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      display: grid; place-items: center; font-size: 17px;
+      background: var(--primary); color: #fff;
+    }
+    .row.user .avatar { background: var(--accent); }
+    .bubble {
+      max-width: 75%; padding: 10px 14px; border-radius: 16px;
+      font-size: 15px; line-height: 1.45; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      word-wrap: break-word;
+    }
+    .row.bot .bubble { background: var(--bot-bubble); border-bottom-left-radius: 4px; }
+    .row.user .bubble { background: var(--user-bubble); color: #fff; border-bottom-right-radius: 4px; }
+    .time { display: block; font-size: 11px; opacity: 0.65; margin-top: 4px; text-align: right; }
+
+    /* ===== Typing animation ===== */
+    .typing span {
+      display: inline-block; width: 8px; height: 8px; margin: 0 2px;
+      background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite;
+    }
+    .typing span:nth-child(2) { animation-delay: 0.2s; }
+    .typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
+    @keyframes pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    /* ===== Input area ===== */
+    .input-bar {
+      display: flex; gap: 10px; padding: 14px 16px;
+      border-top: 1px solid var(--border); background: var(--card);
+    }
+    .input-bar input {
+      flex: 1; padding: 12px 16px; border-radius: 25px; font-size: 15px;
+      border: 1px solid var(--border); background: var(--chat-bg); color: var(--text); outline: none;
+    }
+    .input-bar input:focus { border-color: var(--primary-2); }
+    .send {
+      border: none; color: #fff; padding: 0 22px; border-radius: 25px; font-size: 15px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2)); cursor: pointer;
+    }
+    .send:disabled { opacity: 0.5; cursor: not-allowed; }
+    .footer { text-align: center; font-size: 11px; color: var(--muted); padding: 0 0 10px; background: var(--card); }
+
+    @media (max-width: 500px) {
+      body { padding: 0; }
+      .app { height: 100vh; max-height: none; border-radius: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">🎓</div>
+      <div class="title">
+        <h1>Sample College of Engineering</h1>
+        <p><span class="dot"></span>FAQ Assistant • Online</p>
+      </div>
+      <button class="icon-btn" id="themeBtn" title="Dark / Light mode">🌙</button>
+      <button class="icon-btn" id="clearBtn" title="Clear chat">🗑️</button>
+    </div>
+
+    <!-- Quick questions -->
+    <div class="chips">
+      <button class="chip">🕘 Working hours</button>
+      <button class="chip">📝 Admission</button>
+      <button class="chip">💰 Fee structure</button>
+      <button class="chip">🏠 Hostel</button>
+      <button class="chip">📚 Library timings</button>
+      <button class="chip">📞 Contact office</button>
+      <button class="chip">💼 Placement</button>
+    </div>
+
+    <!-- Chat messages -->
+    <div id="chat"></div>
+
+    <!-- Input -->
+    <div class="input-bar">
+      <input id="question" type="text" placeholder="Type your question here..." autocomplete="off" />
+      <button class="send" id="sendBtn">Send ➤</button>
+    </div>
+    <div class="footer">Answers come from the college FAQ database.</div>
+  </div>
+
+  <script>
+    const chat = document.getElementById("chat");
+    const input = document.getElementById("question");
+    const sendBtn = document.getElementById("sendBtn");
+    const themeBtn = document.getElementById("themeBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    // Chip button click pannaa, adhoda question-a anupurom.
+    // Key = button text, Value = actual question (backend-ku puriya)
+    const QUICK = {
+      "🕘 Working hours": "What are the college working hours?",
+      "📝 Admission": "How can I apply for admission?",
+      "💰 Fee structure": "What is the fee structure?",
+      "🏠 Hostel": "Is hostel facility available?",
+      "📚 Library timings": "What are the library timings?",
+      "📞 Contact office": "How can I contact the college office?",
+      "💼 Placement": "Does the college provide placement support?",
+    };
+
+    // Ippo neram (example: 10:30 AM)
+    function nowTime() {
+      return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    // Chat la message add pannum function. who = "user" or "bot"
+    function addMessage(text, who) {
+      const row = document.createElement("div");
+      row.className = "row " + who;
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar";
+      avatar.textContent = who === "bot" ? "🤖" : "🧑";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = text;          // textContent = safe (HTML inject aagaadhu)
+
+      const time = document.createElement("span");
+      time.className = "time";
+      time.textContent = nowTime();
+      bubble.appendChild(time);
+
+      row.appendChild(avatar);
+      row.appendChild(bubble);
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+      return row;
+    }
+
+    // Bot "typing..." animation kaattum
+    function showTyping() {
+      const row = document.createElement("div");
+      row.className = "row bot";
+      row.innerHTML =
+        '<div class="avatar">🤖</div>' +
+        '<div class="bubble typing"><span></span><span></span><span></span></div>';
+      chat.appendChild(row);
+      chat.scrollTop = chat.scrollHeight;
+      return row;
+    }
+
+    function welcome() {
+      addMessage("Hello! 👋 Welcome to Sample College. Ask me anything or tap a quick question above.", "bot");
+    }
+
+    // Main function: question-a backend ku anuppum
+    async function sendQuestion(text) {
+      const question = (text || input.value).trim();
+      if (!question) return;
+
+      addMessage(question, "user");
+      input.value = "";
+      sendBtn.disabled = true;
+      const typing = showTyping();
+
+      try {
+        const response = await fetch("/api/faq", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question: question }),
+        });
+        const data = await response.json();
+
+        // Konjam neram wait pannitu answer kaattuvom (natural-a theriya)
+        await new Promise((r) => setTimeout(r, 500));
+        typing.remove();
+        addMessage(response.ok ? data.answer : (data.error || "Something went wrong."), "bot");
+      } catch (err) {
+        typing.remove();
+        addMessage("Cannot reach the server. Is it running?", "bot");
+      } finally {
+        sendBtn.disabled = false;
+        input.focus();
+      }
+    }
+
+    // Events
+    sendBtn.addEventListener("click", () => sendQuestion());
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendQuestion(); });
+
+    document.querySelectorAll(".chip").forEach((chip) => {
+      chip.addEventListener("click", () => sendQuestion(QUICK[chip.textContent.trim()]));
+    });
+
+    themeBtn.addEventListener("click", () => {
+      const dark = document.documentElement.classList.toggle("dark");
+      themeBtn.textContent = dark ? "☀️" : "🌙";
+    });
+
+    clearBtn.addEventListener("click", () => { chat.innerHTML = ""; welcome(); });
+
+    welcome();
+  </script>
+</body>
+</html>

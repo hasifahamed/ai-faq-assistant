@@ -3,137 +3,142 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>College FAQ Assistant</title>
+  <title>Goofy Bot - College FAQ</title>
   <style>
-    /* ===== Colors (light theme). Inga color maathina full page maarum ===== */
+    /* ===== Colors. Change these to change the whole theme ===== */
     :root {
-      --primary: #1e3a8a;
-      --primary-2: #3b82f6;
-      --accent: #f59e0b;
-      --bg: #eef2f9;
-      --card: #ffffff;
-      --chat-bg: #f6f8fc;
-      --bot-bubble: #ffffff;
-      --user-bubble: linear-gradient(135deg, #1e3a8a, #3b82f6);
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #e2e8f0;
+      --bg: #ffd93d;
+      --dots: #ffc700;
+      --card: #fffdf2;
+      --ink: #1a1a1a;
+      --pink: #ff6b9d;
+      --blue: #4dabf7;
+      --green: #69db7c;
+      --bot-bg: #ffffff;
+      --user-bg: #ff6b9d;
     }
-    /* ===== Dark theme ===== */
-    html.dark {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --chat-bg: #0f172a;
-      --bot-bubble: #334155;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --border: #334155;
+    html.night {
+      --bg: #2b1055;
+      --dots: #3a1a70;
+      --card: #1f1440;
+      --ink: #ffffff;
+      --bot-bg: #34215f;
+      --user-bg: #d6336c;
     }
 
     * { box-sizing: border-box; }
     body {
-      margin: 0; min-height: 100vh; padding: 20px;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: var(--bg); color: var(--text);
+      margin: 0; min-height: 100vh; padding: 16px;
+      font-family: "Comic Sans MS", "Chalkboard SE", "Segoe UI", cursive, sans-serif;
+      color: var(--ink); background-color: var(--bg);
+      background-image: radial-gradient(var(--dots) 20%, transparent 21%);
+      background-size: 28px 28px;
       display: flex; justify-content: center; align-items: center;
-      transition: background 0.3s;
     }
 
     .app {
-      width: 100%; max-width: 760px; height: 92vh; max-height: 780px;
-      background: var(--card); border-radius: 18px; overflow: hidden;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
-      display: flex; flex-direction: column;
+      width: 100%; max-width: 760px; height: 94vh; max-height: 800px;
+      display: flex; flex-direction: column; overflow: hidden;
+      background: var(--card); border: 4px solid #1a1a1a; border-radius: 24px;
+      box-shadow: 10px 10px 0 #1a1a1a;
     }
+    html.night .app { border-color: #fff; box-shadow: 10px 10px 0 #ff6b9d; }
 
     /* ===== Header ===== */
     .header {
-      background: linear-gradient(135deg, var(--primary), var(--primary-2));
-      color: #fff; padding: 16px 20px;
-      display: flex; align-items: center; gap: 14px;
-      border-bottom: 4px solid var(--accent);
+      display: flex; align-items: center; gap: 14px; padding: 12px 18px;
+      background: var(--blue); border-bottom: 4px solid #1a1a1a; color: #1a1a1a;
     }
-    .logo {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: #fff; display: grid; place-items: center; font-size: 28px;
+    html.night .header { border-color: #fff; }
+    .robot-wrap {
+      width: 76px; height: 76px; flex-shrink: 0; background: #fff;
+      border: 4px solid #1a1a1a; border-radius: 50%; display: grid; place-items: center;
+      animation: wiggle 3s ease-in-out infinite;
     }
-    .title { flex: 1; }
-    .title h1 { margin: 0; font-size: 19px; }
-    .title p { margin: 3px 0 0; font-size: 13px; opacity: 0.9; }
-    .dot {
-      display: inline-block; width: 9px; height: 9px; border-radius: 50%;
-      background: #22c55e; margin-right: 5px;
-    }
+    @keyframes wiggle { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+    .title { flex: 1; min-width: 0; }
+    .title h1 { margin: 0; font-size: 21px; }
+    .title p { margin: 3px 0 0; font-size: 13px; font-weight: bold; }
     .icon-btn {
-      background: rgba(255, 255, 255, 0.18); border: none; color: #fff;
-      width: 38px; height: 38px; border-radius: 50%; font-size: 17px; cursor: pointer;
+      width: 42px; height: 42px; font-size: 19px; cursor: pointer;
+      background: #fff; border: 3px solid #1a1a1a; border-radius: 12px;
+      box-shadow: 3px 3px 0 #1a1a1a; transition: 0.1s;
     }
-    .icon-btn:hover { background: rgba(255, 255, 255, 0.32); }
+    .icon-btn:hover { transform: translate(-2px, -2px) rotate(-6deg); }
+    .icon-btn:active { transform: translate(3px, 3px); box-shadow: none; }
+
+    /* ===== Robot face parts ===== */
+    .blink { transform-box: fill-box; transform-origin: center; animation: blink 4s infinite; }
+    @keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(0.1); } }
+    .pupil { transition: transform 0.08s; }
+    .mouth-open, .tongue { display: none; }
+    .talking .mouth-smile { display: none; }
+    .talking .mouth-open, .talking .tongue { display: block; }
+    .talking .tongue { animation: lick 0.3s infinite alternate; transform-box: fill-box; transform-origin: top; }
+    @keyframes lick { from { transform: scaleY(0.7); } to { transform: scaleY(1.15); } }
 
     /* ===== Quick question chips ===== */
     .chips {
-      display: flex; gap: 8px; padding: 12px 16px; overflow-x: auto;
-      border-bottom: 1px solid var(--border); background: var(--card);
+      display: flex; gap: 10px; padding: 12px 16px; overflow-x: auto;
+      background: var(--green); border-bottom: 4px solid #1a1a1a; scrollbar-width: none;
     }
+    html.night .chips { border-color: #fff; }
+    .chips::-webkit-scrollbar { display: none; }
     .chip {
-      white-space: nowrap; border: 1px solid var(--primary-2); color: var(--primary-2);
-      background: transparent; padding: 7px 14px; border-radius: 20px;
-      font-size: 13px; cursor: pointer; transition: 0.2s;
+      white-space: nowrap; padding: 8px 14px; font-size: 13px; font-weight: bold; cursor: pointer;
+      font-family: inherit; color: #1a1a1a; background: #fff;
+      border: 3px solid #1a1a1a; border-radius: 999px; box-shadow: 3px 3px 0 #1a1a1a; transition: 0.1s;
     }
-    .chip:hover { background: var(--primary-2); color: #fff; }
+    .chip:hover { background: var(--pink); transform: translate(-2px, -2px) rotate(-3deg); }
+    .chip:active { transform: translate(3px, 3px); box-shadow: none; }
 
-    /* ===== Chat area ===== */
-    #chat {
-      flex: 1; overflow-y: auto; padding: 18px; background: var(--chat-bg);
-      display: flex; flex-direction: column; gap: 14px;
-    }
-    .row { display: flex; gap: 10px; align-items: flex-end; animation: pop 0.25s ease; }
+    /* ===== Chat ===== */
+    #chat { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 16px; }
+    .row { display: flex; gap: 10px; align-items: flex-end; animation: boing 0.4s ease; }
     .row.user { flex-direction: row-reverse; }
+    @keyframes boing {
+      0% { opacity: 0; transform: scale(0.6) translateY(20px); }
+      60% { transform: scale(1.06); }
+      100% { opacity: 1; transform: none; }
+    }
     .avatar {
-      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
-      display: grid; place-items: center; font-size: 17px;
-      background: var(--primary); color: #fff;
+      width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center;
+      background: #fff; border: 3px solid #1a1a1a; border-radius: 50%; font-size: 22px; overflow: hidden;
     }
-    .row.user .avatar { background: var(--accent); }
     .bubble {
-      max-width: 75%; padding: 10px 14px; border-radius: 16px;
-      font-size: 15px; line-height: 1.45; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-      word-wrap: break-word;
+      max-width: 75%; padding: 10px 15px; font-size: 15px; line-height: 1.45; word-wrap: break-word;
+      border: 3px solid #1a1a1a; box-shadow: 4px 4px 0 #1a1a1a; color: #1a1a1a;
     }
-    .row.bot .bubble { background: var(--bot-bubble); border-bottom-left-radius: 4px; }
-    .row.user .bubble { background: var(--user-bubble); color: #fff; border-bottom-right-radius: 4px; }
-    .time { display: block; font-size: 11px; opacity: 0.65; margin-top: 4px; text-align: right; }
+    html.night .bubble { border-color: #fff; box-shadow: 4px 4px 0 #ff6b9d; color: #fff; }
+    .row.bot .bubble { background: var(--bot-bg); border-radius: 20px 20px 20px 4px; }
+    .row.user .bubble { background: var(--user-bg); color: #fff; border-radius: 20px 20px 4px 20px; }
+    .joke { display: block; margin-top: 6px; font-size: 13px; font-style: italic; opacity: 0.85; }
+    .time { display: block; font-size: 11px; opacity: 0.6; margin-top: 4px; text-align: right; }
 
-    /* ===== Typing animation ===== */
-    .typing span {
-      display: inline-block; width: 8px; height: 8px; margin: 0 2px;
-      background: var(--muted); border-radius: 50%; animation: bounce 1.2s infinite;
-    }
-    .typing span:nth-child(2) { animation-delay: 0.2s; }
-    .typing span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes bounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-6px); } }
-    @keyframes pop { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-
-    /* ===== Input area ===== */
-    .input-bar {
-      display: flex; gap: 10px; padding: 14px 16px;
-      border-top: 1px solid var(--border); background: var(--card);
-    }
+    /* ===== Input ===== */
+    .input-bar { display: flex; gap: 10px; padding: 14px 16px 8px; }
     .input-bar input {
-      flex: 1; padding: 12px 16px; border-radius: 25px; font-size: 15px;
-      border: 1px solid var(--border); background: var(--chat-bg); color: var(--text); outline: none;
+      flex: 1; padding: 12px 18px; font-size: 15px; font-family: inherit; outline: none;
+      color: var(--ink); background: #fff; border: 3px solid #1a1a1a; border-radius: 999px;
+      box-shadow: 4px 4px 0 #1a1a1a;
     }
-    .input-bar input:focus { border-color: var(--primary-2); }
+    html.night .input-bar input { background: #34215f; border-color: #fff; box-shadow: 4px 4px 0 #ff6b9d; }
+    .input-bar input:focus { background: #fff9c4; }
+    html.night .input-bar input:focus { background: #4a2f85; }
     .send {
-      border: none; color: #fff; padding: 0 22px; border-radius: 25px; font-size: 15px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-2)); cursor: pointer;
+      padding: 0 22px; font-size: 15px; font-weight: bold; font-family: inherit; cursor: pointer;
+      color: #fff; background: var(--pink); border: 3px solid #1a1a1a; border-radius: 999px;
+      box-shadow: 4px 4px 0 #1a1a1a; transition: 0.1s;
     }
-    .send:disabled { opacity: 0.5; cursor: not-allowed; }
-    .footer { text-align: center; font-size: 11px; color: var(--muted); padding: 0 0 10px; background: var(--card); }
+    .send:hover { transform: translate(-2px, -2px) rotate(-2deg); }
+    .send:active { transform: translate(3px, 3px); box-shadow: none; }
+    .send:disabled { opacity: 0.55; cursor: not-allowed; }
+    .footer { text-align: center; font-size: 12px; padding: 4px 0 12px; opacity: 0.75; }
 
-    @media (max-width: 500px) {
+    @media (max-width: 520px) {
       body { padding: 0; }
-      .app { height: 100vh; max-height: none; border-radius: 0; }
+      .app { height: 100vh; max-height: none; border-radius: 0; border-width: 0; box-shadow: none; }
+      .bubble { max-width: 85%; }
     }
   </style>
 </head>
@@ -142,12 +147,12 @@
 
     <!-- Header -->
     <div class="header">
-      <div class="logo">🎓</div>
+      <div class="robot-wrap" id="headerRobot"></div>
       <div class="title">
-        <h1>Sample College of Engineering</h1>
-        <p><span class="dot"></span>FAQ Assistant • Online</p>
+        <h1>Goofy Bot 🤪</h1>
+        <p>Sample College FAQ • Serious answers, silly bot!</p>
       </div>
-      <button class="icon-btn" id="themeBtn" title="Dark / Light mode">🌙</button>
+      <button class="icon-btn" id="themeBtn" title="Night mode">🌙</button>
       <button class="icon-btn" id="clearBtn" title="Clear chat">🗑️</button>
     </div>
 
@@ -162,15 +167,15 @@
       <button class="chip">💼 Placement</button>
     </div>
 
-    <!-- Chat messages -->
+    <!-- Messages -->
     <div id="chat"></div>
 
     <!-- Input -->
     <div class="input-bar">
-      <input id="question" type="text" placeholder="Type your question here..." autocomplete="off" />
-      <button class="send" id="sendBtn">Send ➤</button>
+      <input id="question" type="text" placeholder="Ask me anything, I promise I don't bite... 😜" autocomplete="off" />
+      <button class="send" id="sendBtn">Send 🚀</button>
     </div>
-    <div class="footer">Answers come from the college FAQ database.</div>
+    <div class="footer">Answers come only from the college FAQ database.</div>
   </div>
 
   <script>
@@ -179,9 +184,9 @@
     const sendBtn = document.getElementById("sendBtn");
     const themeBtn = document.getElementById("themeBtn");
     const clearBtn = document.getElementById("clearBtn");
+    const headerRobot = document.getElementById("headerRobot");
 
-    // Chip button click pannaa, adhoda question-a anupurom.
-    // Key = button text, Value = actual question (backend-ku puriya)
+    // Chip text -> the actual question sent to the backend
     const QUICK = {
       "🕘 Working hours": "What are the college working hours?",
       "📝 Admission": "How can I apply for admission?",
@@ -192,23 +197,87 @@
       "💼 Placement": "Does the college provide placement support?",
     };
 
-    // Ippo neram (example: 10:30 AM)
+    // Random funny lines shown while the bot is "thinking"
+    const THINKING = [
+      "Brain overheating... 🔥",
+      "Searching the FAQ, one sec... ☕",
+      "Hmm... let me think about that 🤔",
+      "Robot brain loading... 🧠⏳",
+      "Chasing down your answer 🏃",
+    ];
+
+    // Extra funny line shown only when the bot doesn't know the answer.
+    // (The real answer text always comes from the backend.)
+    const DONT_KNOW_JOKES = [
+      "That's not in my brain, sorry! 🙈",
+      "That's not in the FAQ. Try Google! 😅",
+      "I only know the FAQ, nothing else 🤷",
+    ];
+
+    // Funny robot face (SVG). Change the size to use it anywhere.
+    function robotSVG(size) {
+      return `
+      <svg class="robot" width="${size}" height="${size}" viewBox="0 0 64 64" fill="none">
+        <line x1="32" y1="4" x2="32" y2="12" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="32" cy="5" r="4" fill="#ff6b9d" stroke="#1a1a1a" stroke-width="2.5"/>
+        <rect x="6" y="28" width="6" height="12" rx="3" fill="#4dabf7" stroke="#1a1a1a" stroke-width="2.5"/>
+        <rect x="52" y="28" width="6" height="12" rx="3" fill="#4dabf7" stroke="#1a1a1a" stroke-width="2.5"/>
+        <rect x="10" y="12" width="44" height="42" rx="16" fill="#ffd93d" stroke="#1a1a1a" stroke-width="3"/>
+        <g class="blink">
+          <circle cx="23" cy="29" r="8" fill="#fff" stroke="#1a1a1a" stroke-width="2.5"/>
+          <circle cx="41" cy="29" r="8" fill="#fff" stroke="#1a1a1a" stroke-width="2.5"/>
+          <circle class="pupil" cx="23" cy="29" r="3.5" fill="#1a1a1a"/>
+          <circle class="pupil" cx="41" cy="29" r="3.5" fill="#1a1a1a"/>
+        </g>
+        <circle cx="15" cy="41" r="3.5" fill="#ff6b9d" opacity="0.7"/>
+        <circle cx="49" cy="41" r="3.5" fill="#ff6b9d" opacity="0.7"/>
+        <path class="mouth-smile" d="M23 44 Q32 52 41 44" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path class="mouth-open" d="M23 43 Q32 55 41 43 Z" fill="#7a1f3d" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
+        <path class="tongue" d="M28 48 Q32 57 36 48 Z" fill="#ff6b9d"/>
+      </svg>`;
+    }
+
+    headerRobot.innerHTML = robotSVG(58);
+
+    // The robot's eyes follow the mouse cursor
+    document.addEventListener("mousemove", (e) => {
+      document.querySelectorAll("svg.robot").forEach((svg) => {
+        const r = svg.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2);
+        const dy = e.clientY - (r.top + r.height / 2);
+        const dist = Math.hypot(dx, dy) || 1;
+        const move = Math.min(3.5, dist / 30);
+        svg.querySelectorAll(".pupil").forEach((p) => {
+          p.style.transform = "translate(" + (dx / dist) * move + "px," + (dy / dist) * move + "px)";
+        });
+      });
+    });
+
     function nowTime() {
       return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
+    function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
 
-    // Chat la message add pannum function. who = "user" or "bot"
-    function addMessage(text, who) {
+    // Adds a message to the chat. who = "user" or "bot"
+    function addMessage(text, who, joke) {
       const row = document.createElement("div");
       row.className = "row " + who;
 
       const avatar = document.createElement("div");
       avatar.className = "avatar";
-      avatar.textContent = who === "bot" ? "🤖" : "🧑";
+      if (who === "bot") avatar.innerHTML = robotSVG(34);
+      else avatar.textContent = "😎";
 
       const bubble = document.createElement("div");
       bubble.className = "bubble";
-      bubble.textContent = text;          // textContent = safe (HTML inject aagaadhu)
+      bubble.appendChild(document.createTextNode(text));   // safe: HTML cannot be injected
+
+      if (joke) {
+        const j = document.createElement("span");
+        j.className = "joke";
+        j.textContent = joke;
+        bubble.appendChild(j);
+      }
 
       const time = document.createElement("span");
       time.className = "time";
@@ -219,26 +288,27 @@
       row.appendChild(bubble);
       chat.appendChild(row);
       chat.scrollTop = chat.scrollHeight;
-      return row;
     }
 
-    // Bot "typing..." animation kaattum
+    // Shows a "thinking" bubble and makes the header robot talk
     function showTyping() {
       const row = document.createElement("div");
       row.className = "row bot";
       row.innerHTML =
-        '<div class="avatar">🤖</div>' +
-        '<div class="bubble typing"><span></span><span></span><span></span></div>';
+        '<div class="avatar">' + robotSVG(34) + "</div>" +
+        '<div class="bubble"></div>';
+      row.querySelector(".bubble").textContent = pick(THINKING);
       chat.appendChild(row);
       chat.scrollTop = chat.scrollHeight;
+      headerRobot.classList.add("talking");
       return row;
     }
 
     function welcome() {
-      addMessage("Hello! 👋 Welcome to Sample College. Ask me anything or tap a quick question above.", "bot");
+      addMessage("Hey there! 👋 I'm Goofy Bot. Ask me anything about the college, or tap one of the buttons above!", "bot");
     }
 
-    // Main function: question-a backend ku anuppum
+    // Main function: sends the question to the backend
     async function sendQuestion(text) {
       const question = (text || input.value).trim();
       if (!question) return;
@@ -256,14 +326,21 @@
         });
         const data = await response.json();
 
-        // Konjam neram wait pannitu answer kaattuvom (natural-a theriya)
-        await new Promise((r) => setTimeout(r, 500));
+        await new Promise((r) => setTimeout(r, 900));   // pretend to think
         typing.remove();
-        addMessage(response.ok ? data.answer : (data.error || "Something went wrong."), "bot");
+
+        if (response.ok) {
+          // Add a funny line only when the backend says it doesn't know
+          const unknown = data.answer.startsWith("Sorry, I don't know");
+          addMessage(data.answer, "bot", unknown ? pick(DONT_KNOW_JOKES) : null);
+        } else {
+          addMessage(data.error || "Something went wrong.", "bot");
+        }
       } catch (err) {
         typing.remove();
-        addMessage("Cannot reach the server. Is it running?", "bot");
+        addMessage("I can't reach the server! Is the Python server running? 😱", "bot");
       } finally {
+        headerRobot.classList.remove("talking");
         sendBtn.disabled = false;
         input.focus();
       }
@@ -272,16 +349,13 @@
     // Events
     sendBtn.addEventListener("click", () => sendQuestion());
     input.addEventListener("keydown", (e) => { if (e.key === "Enter") sendQuestion(); });
-
     document.querySelectorAll(".chip").forEach((chip) => {
       chip.addEventListener("click", () => sendQuestion(QUICK[chip.textContent.trim()]));
     });
-
     themeBtn.addEventListener("click", () => {
-      const dark = document.documentElement.classList.toggle("dark");
-      themeBtn.textContent = dark ? "☀️" : "🌙";
+      const night = document.documentElement.classList.toggle("night");
+      themeBtn.textContent = night ? "☀️" : "🌙";
     });
-
     clearBtn.addEventListener("click", () => { chat.innerHTML = ""; welcome(); });
 
     welcome();

@@ -1,11 +1,5 @@
-# faq_search.py
-# User kelvi-kum FAQ data-kum match pannum simple logic.
-# AI model illa, simple "word matching" dhaan.
-
 import re
 
-# "Stop words" = artham illatha common words (the, is, what...).
-# Ivalai ignore pannitta, mukkiyamana words mattum compare aagum.
 STOP_WORDS = {
     "a", "an", "the", "is", "are", "was", "were", "am", "be", "do", "does",
     "did", "what", "when", "where", "who", "how", "which", "can", "i", "you",
@@ -14,7 +8,6 @@ STOP_WORDS = {
     "with", "from", "has", "have", "will", "would", "should", "could",
 }
 
-# User words la kuraindha patcham 60% match aanaal dhaan answer tharuvom.
 MIN_MATCH_RATIO = 0.6
 
 
